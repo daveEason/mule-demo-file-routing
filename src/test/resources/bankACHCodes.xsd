@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="msg" type="msgType"/>
+  <xs:complexType name="bodyType">
+    <xs:sequence>
+      <xs:element type="BankACHCodesType" name="BankACHCodes"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="headerType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="destination"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BankACHCodesType">
+    <xs:sequence>
+      <xs:element type="BankACHCodeType" name="BankACHCode" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="msgType">
+    <xs:sequence>
+      <xs:element type="headerType" name="header"/>
+      <xs:element type="bodyType" name="body"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BankACHCodeType">
+    <xs:sequence>
+      <xs:element name="BankName">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="UOB"/>
+            <xs:enumeration value="FEB"/>
+            <xs:enumeration value="DBS"/>
+            <xs:enumeration value="POSBank"/>
+            <xs:enumeration value="OCBC"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="BankCode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="7375"/>
+            <xs:enumeration value="7199"/>
+            <xs:enumeration value="7171"/>
+            <xs:enumeration value="7339"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="BranchCode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="030"/>
+            <xs:enumeration value="004"/>
+            <xs:enumeration value="005"/>
+            <xs:enumeration value="081"/>
+            <xs:enumeration value="550"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

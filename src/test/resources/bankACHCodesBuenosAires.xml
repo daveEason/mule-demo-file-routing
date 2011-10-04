@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<msg>
+    <header>
+        <destination>BuenosAires</destination>
+    </header>
+    <body>
+        <BankACHCodes>
+            <BankACHCode>
+                <BankName>UOB</BankName>
+                <BankCode>7375</BankCode>
+                <BranchCode>030</BranchCode>
+            </BankACHCode>
+            <BankACHCode>
+                <BankName>FEB</BankName>
+                <BankCode>7199</BankCode>
+                <BranchCode>004</BranchCode>
+            </BankACHCode>
+            <BankACHCode>
+                <BankName>DBS</BankName>
+                <BankCode>7171</BankCode>
+                <BranchCode>005</BranchCode>
+            </BankACHCode>
+            <BankACHCode>
+                <BankName>POSBank</BankName>
+                <BankCode>7171</BankCode>
+                <BranchCode>081</BranchCode>
+            </BankACHCode>
+            <BankACHCode>
+                <BankName>OCBC</BankName>
+                <BankCode>7339</BankCode>
+                <BranchCode>550</BranchCode>
+            </BankACHCode>
+        </BankACHCodes>
+    </body>
+</msg>

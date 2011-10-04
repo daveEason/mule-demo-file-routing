@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+          http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+          http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.2/mule-stdio.xsd
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <description>Mule demo application illustrates file based routing functionality</description>
+
+    <context:property-placeholder location="mule.properties"/>
+
+    <spring:beans/>
+
+    <file:connector name="inputFiles" autoDelete="true" fileAge="500" pollingFrequency="1500"/>
+    <file:connector name="outputFiles" outputAppend="false"/>
+    <file:file-to-string-transformer name="file2String"/>
+    <stdio:connector name="stdioConnector"
+                     outputMessage="ERROR: #[function:datestamp] Error has occurred while processing, refer to input file backup directory and resubmit files\n"/>
+
+
+    <flow name="inbound_ReceiveFiles">
+
+       <file:inbound-endpoint connector-ref="inputFiles" path="${installDirectory}/inputFiles"
+                              moveToDirectory="${installDirectory}/inputFileBackup"
+                              moveToPattern="#[header:originalFilename].backup"
+                              transformer-refs="file2String"/>
+
+
+        <choice>
+            <when expression="//msg/header/destination='SanFrancisco'" evaluator="xpath">
+                <flow-ref name="outbound_SanFrancisco"/>
+            </when>
+            <when expression="//msg/header/destination='BuenosAires'" evaluator="xpath">
+                <flow-ref name="outbound_BuenosAires"/>
+            </when>
+            <when expression="//msg/header/destination='London'" evaluator="xpath">
+                <flow-ref name="outbound_London"/>
+            </when>
+            <otherwise>
+                <flow-ref name="outbound_Default"/>
+            </otherwise>
+        </choice>
+
+        <!-- Route unexpected errors to separate error handler -->
+        <default-exception-strategy>
+            <flow-ref name="SystemErrorHandler"/>
+        </default-exception-strategy>
+
+    </flow>
+
+    <flow name="outbound_SanFrancisco">
+
+        <file:outbound-endpoint connector-ref="outputFiles"
+                                path="${installDirectory}/outputFileSanFrancisco"
+                                outputPattern="#[function:datestamp]-#[header:originalFilename]"/>
+
+        <!-- Route unexpected errors to separate error handler -->
+        <default-exception-strategy>
+            <flow-ref name="SystemErrorHandler"/>
+        </default-exception-strategy>
+
+    </flow>
+
+    <flow name="outbound_BuenosAires">
+
+        <file:outbound-endpoint connector-ref="outputFiles"
+                                path="${installDirectory}/outputFileBuenosAires"
+                                outputPattern="#[function:datestamp]-#[header:originalFilename]"/>
+
+        <!-- Route unexpected errors to separate error handler -->
+        <default-exception-strategy>
+            <flow-ref name="SystemErrorHandler"/>
+        </default-exception-strategy>
+
+    </flow>
+
+    <flow name="outbound_London">
+
+        <file:outbound-endpoint connector-ref="outputFiles"
+                                path="${installDirectory}/outputFileLondon"
+                                outputPattern="#[function:datestamp]-#[header:originalFilename]"/>
+
+        <!-- Route unexpected errors to separate error handler -->
+        <default-exception-strategy>
+            <flow-ref name="SystemErrorHandler"/>
+        </default-exception-strategy>
+
+    </flow>
+
+    <flow name="outbound_Default">
+
+        <file:outbound-endpoint connector-ref="outputFiles"
+                                path="${installDirectory}/outputFileDefault"
+                                outputPattern="#[function:datestamp]-#[header:originalFilename]"/>
+
+        <!-- Route unexpected errors to separate error handler -->
+        <default-exception-strategy>
+            <flow-ref name="SystemErrorHandler"/>
+        </default-exception-strategy>
+
+    </flow>
+
+    <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
+        e.g. into an error file, send via email to a list, stored in a database, etc. -->
+    <flow name="SystemErrorHandler">
+        <stdio:outbound-endpoint system="OUT" connector-ref="stdioConnector"/>
+    </flow>
+</mule>
